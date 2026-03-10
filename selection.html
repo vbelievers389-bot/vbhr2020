@@ -411,11 +411,20 @@ async function sendEmail() {
         const { jsPDF } = window.jspdf;
         const element = document.querySelector(".letter");
 
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    scrollY: -window.scrollY,
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight
+});
         const imgData = canvas.toDataURL('image/jpeg', 0.7);
 
         const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+        const imgWidth = 210;
+const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
         
         const mapUrl = document.getElementById("mapLink").href;
         pdf.link(70, 210, 70, 8, { url: mapUrl });
@@ -453,3 +462,4 @@ async function sendEmail() {
 
 </body>
 </html>
+
