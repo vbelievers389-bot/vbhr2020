@@ -92,7 +92,7 @@ body {
     border: 1.5px solid #000;
 }
 
-/* ===== WATERMARK ===== */
+/* ===== WATERMARK - HIDDEN DURING PDF CAPTURE ===== */
 .watermark {
     position: absolute;
     inset: 0;
@@ -103,6 +103,7 @@ body {
     opacity: 0.20;
     z-index: 1;
     animation: fadeIn 2s ease-out;
+    pointer-events: none;
 }
 
 @keyframes fadeIn {
@@ -164,8 +165,8 @@ body {
 }
 
 .print-btn:hover::before, .email-btn:hover::before {
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
 }
 
 .print-btn:hover, .email-btn:hover {
@@ -280,6 +281,21 @@ p {
 .loading-spinner.active {
     display: block;
 }
+
+/* ===== HIDE ANIMATIONS DURING PDF CAPTURE ===== */
+.letter.pdf-mode .content > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.letter.pdf-mode {
+    animation: none !important;
+}
+
+.pdf-mode .watermark {
+    display: none !important;
+}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -289,11 +305,11 @@ p {
 <body>
 
 <button class="print-btn" onclick="window.print()">🖨 Print Letter</button>
-<button class="email-btn" onclick="sendEmail()">✉ Send PDF via Email</button>
+<button class="email-btn" id="sendBtn" onclick="sendEmail()">✉ Send PDF via Email</button>
 
 <div class="loading-spinner" id="loadingSpinner"></div>
 
-<div class="letter">
+<div class="letter" id="letterElement">
   <div class="inner-border"></div>
   <div class="watermark"></div>
 
@@ -302,10 +318,10 @@ p {
 
     <div class="heading">TO:</div>
     <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><span id="name"></span></b><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="district"></span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ph No: <span id="phone"></span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register No: <span id="regNo"></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><span id="name">N/A</span></b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="district">N/A</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ph No: <span id="phone">N/A</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register No: <span id="regNo">N/A</span>
     </p>
 
     <div class="heading">RESPECTED SIR / MADAM,</div>
@@ -323,7 +339,7 @@ p {
 
     <div class="heading">Training Details</div>
     <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training Start Date: <span id="circleDate"></span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training Start Date: <span id="circleDate">DD-MM-YYYY</span><br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reporting Time: 9:30 AM onwards<br>
       &nbsp;&nbsp;&nbsp;&nbsp;<b><u>Note:</u> Please verify your documents before the training day and if you want food & accommodation you need to take membership.</b>
     </p>
@@ -371,6 +387,7 @@ window.onload = function() {
         return `${day}-${month}-${year}`;
     }
 
+    // Populate all fields - with fallback values
     document.getElementById("regNo").textContent = data.regNo || "N/A";
     document.getElementById("name").textContent = data.name || "N/A";
     document.getElementById("district").textContent = data.district || "N/A";
@@ -380,6 +397,7 @@ window.onload = function() {
     document.getElementById("docTitle").textContent = (data.name || "Applicant") + " - Selection Letter";
 
     window.currentEmail = data.email || null;
+    window.currentBranch = data.branch || "Kurnool";
 
     const mapLinks = {
         "Kurnool": "https://maps.app.goo.gl/TVFiSap2dGzCM9Lj7",
@@ -393,10 +411,11 @@ window.onload = function() {
     mapLinkEl.innerText = "📍 View Training Location on Google Maps";
 };
 
-// 📧 SEND EMAIL FUNCTION WITH LOADING ANIMATION
+// 📧 SEND EMAIL FUNCTION WITH PDF GENERATION FIX
 async function sendEmail() {
-    const btn = document.querySelector(".email-btn");
+    const btn = document.getElementById("sendBtn");
     const spinner = document.getElementById("loadingSpinner");
+    const letterEl = document.getElementById("letterElement");
 
     if (!window.currentEmail) {
         alert("❌ Error: No email found for this applicant.");
@@ -408,21 +427,41 @@ async function sendEmail() {
     spinner.classList.add('active');
 
     try {
+        // Step 1: Disable animations for PDF capture
+        letterEl.classList.add('pdf-mode');
+        
+        // Step 2: Wait for DOM to be ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         const { jsPDF } = window.jspdf;
         const element = document.querySelector(".letter");
 
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-        const imgData = canvas.toDataURL('image/jpeg', 0.7);
+        // Step 3: Capture with proper settings
+        const canvas = await html2canvas(element, { 
+            scale: 2, 
+            useCORS: true,
+            logging: false,
+            allowTaint: true,
+            backgroundColor: '#ffffff'
+        });
 
+        const imgData = canvas.toDataURL('image/png'); // Use PNG instead of JPEG for quality
         const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
         
+        // Add image to PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+        
+        // Add clickable link for map
         const mapUrl = document.getElementById("mapLink").href;
-        pdf.link(70, 210, 70, 8, { url: mapUrl });
+        if (mapUrl && mapUrl !== "https://www.google.com/maps") {
+            pdf.link(70, 210, 70, 8, { url: mapUrl });
+        }
 
+        // Step 4: Convert to Base64
         const pdfBase64 = pdf.output('datauristring');
-        const name = document.getElementById("name").innerText;
+        const name = document.getElementById("name").textContent;
 
+        // Step 5: Send via API
         const response = await fetch('/api/send-mail', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -441,9 +480,11 @@ async function sendEmail() {
         }
 
     } catch (err) {
-        console.error(err);
-        alert("❌ Error: Could not connect to the server.");
+        console.error("PDF Generation Error:", err);
+        alert("❌ Error: Could not generate PDF.\n\nDetails: " + err.message);
     } finally {
+        // Re-enable animations
+        letterEl.classList.remove('pdf-mode');
         btn.innerText = "✉ Send PDF via Email";
         btn.disabled = false;
         spinner.classList.remove('active');
