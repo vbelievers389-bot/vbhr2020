@@ -6,284 +6,148 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== ANIMATED BACKGROUND ===== */
-body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-    font-family: "Times New Roman", serif;
+
+body{
+margin:0;
+padding:0;
+background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);
+background-size:400% 400%;
+animation:bg 15s ease infinite;
+font-family:"Times New Roman",serif;
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes bg{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
 }
 
-/* ===== A4 SHEET WITH ENTRANCE ANIMATION ===== */
-.letter {
-    width: 210mm;
-    height: 297mm;
-    margin: 15mm auto;
-    background: #ffffff;
-    position: relative;
-    box-sizing: border-box;
-    padding: 18mm;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    animation: slideInLetter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+.letter{
+width:210mm;
+min-height:297mm;
+margin:15mm auto;
+background:#fff;
+padding:18mm;
+box-shadow:0 10px 40px rgba(0,0,0,0.3);
+position:relative;
+overflow:hidden;
 }
 
-@keyframes slideInLetter {
-    from {
-        opacity: 0;
-        transform: translateY(50px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.inner-border{
+position:absolute;
+top:14mm;
+left:14mm;
+right:14mm;
+bottom:14mm;
+border:2px solid #000;
+pointer-events:none;
 }
 
-/* ===== INNER PAGE BORDER ===== */
-.inner-border {
-    position: absolute;
-    top: 14mm;
-    left: 14mm;
-    right: 14mm;
-    bottom: 14mm;
-    pointer-events: none;
-    animation: borderExpand 1s ease-out;
+.watermark{
+position:absolute;
+inset:0;
+top:10%;
+bottom:30%;
+background:url("watermark.png") center no-repeat;
+background-size:520px;
+opacity:.2;
+z-index:1;
 }
 
-@keyframes borderExpand {
-    from {
-        top: 50%;
-        left: 50%;
-        right: 50%;
-        bottom: 50%;
-    }
-    to {
-        top: 14mm;
-        left: 14mm;
-        right: 14mm;
-        bottom: 14mm;
-    }
+.content{
+position:relative;
+z-index:2;
+font-size:16px;
+line-height:1.7;
 }
 
-.inner-border::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px solid #000;
+h1{
+text-align:center;
+font-size:28px;
+letter-spacing:1.5px;
+text-decoration:underline;
+margin-bottom:15px;
 }
 
-.inner-border::after {
-    content: "";
-    position: absolute;
-    top: 2mm;
-    left: 2mm;
-    right: 2mm;
-    bottom: 2mm;
-    border: 1.5px solid #000;
+.heading{
+font-weight:bold;
+text-decoration:underline;
+margin-top:10px;
 }
 
-/* ===== WATERMARK ===== */
-.watermark {
-    position: absolute;
-    inset: 0;
-    top: 10%;
-    bottom: 30%;
-    background: url("watermark.png") center center no-repeat;
-    background-size: 520px;
-    opacity: 0.20;
-    z-index: 1;
-    animation: fadeIn 2s ease-out;
+p{
+margin:6px 0 6px 8px;
+text-align:justify;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 0.20; }
+.footer{
+margin-top:50px;
+text-align:right;
 }
 
-/* ===== FLOATING ACTION BUTTONS ===== */
-.email-btn, .print-btn {
-    position: fixed;
-    right: 15px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 100;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    animation: slideInRight 0.6s ease-out;
+.map-link{
+color:#000;
+text-decoration:underline;
+font-weight:bold;
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(100px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+.print-btn,.email-btn{
+position:fixed;
+right:15px;
+padding:12px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:14px;
+font-weight:600;
+z-index:100;
 }
 
-.print-btn {
-    top: 15px;
-    background: linear-gradient(135deg, #000000 0%, #434343 100%);
-    color: #fff;
+.print-btn{
+top:15px;
+background:#000;
+color:#fff;
 }
 
-.email-btn {
-    top: 65px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
-    animation-delay: 0.1s;
+.email-btn{
+top:65px;
+background:#667eea;
+color:#fff;
 }
 
-.print-btn::before, .email-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+@media print{
+.print-btn,.email-btn{display:none}
+body{background:#fff}
+.letter{margin:0;box-shadow:none}
 }
 
-.print-btn:hover::before, .email-btn:hover::before {
-    width: 300px;
-    height: 300px;
+.loading-spinner{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:60px;
+height:60px;
+border:6px solid rgba(255,255,255,0.3);
+border-top-color:#667eea;
+border-radius:50%;
+animation:spin 1s linear infinite;
+z-index:1000;
 }
 
-.print-btn:hover, .email-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+.loading-spinner.active{display:block}
+
+@keyframes spin{
+from{transform:translate(-50%,-50%) rotate(0)}
+to{transform:translate(-50%,-50%) rotate(360deg)}
 }
 
-.print-btn:active, .email-btn:active {
-    transform: translateY(-1px);
-}
-
-/* ===== HIDE BUTTONS ON PRINT ===== */
-@media print {
-    .email-btn, .print-btn { display: none; }
-    @page { size: A4; margin: 0; }
-    body { background: #fff; }
-    .letter { margin: 0; box-shadow: none; }
-}
-
-/* ===== CONTENT WITH STAGGER ANIMATION ===== */
-.content {
-    position: relative;
-    z-index: 2;
-    font-size: 16px;
-    line-height: 1.7;
-}
-
-.content > * {
-    animation: fadeInUp 0.6s ease-out backwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.content > *:nth-child(1) { animation-delay: 0.2s; }
-.content > *:nth-child(2) { animation-delay: 0.3s; }
-.content > *:nth-child(3) { animation-delay: 0.4s; }
-.content > *:nth-child(4) { animation-delay: 0.5s; }
-.content > *:nth-child(5) { animation-delay: 0.6s; }
-.content > *:nth-child(6) { animation-delay: 0.7s; }
-.content > *:nth-child(7) { animation-delay: 0.8s; }
-.content > *:nth-child(8) { animation-delay: 0.9s; }
-.content > *:nth-child(9) { animation-delay: 1s; }
-.content > *:nth-child(10) { animation-delay: 1.1s; }
-
-h1 {
-    text-align: center;
-    font-size: 28px;
-    letter-spacing: 1.5px;
-    text-decoration: underline;
-    margin: 0 0 10px 0;
-}
-
-.heading {
-    font-weight: bold;
-    text-decoration: underline;
-    margin-top: 10px;
-}
-
-p {
-    margin: 6px 0 6px 8px;
-    text-align: justify;
-}
-
-.footer {
-    margin-top: 50px;
-    text-align: right;
-}
-
-.map-link {
-    color: #000;
-    text-decoration: underline;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.map-link:hover {
-    color: #667eea;
-    transform: translateX(5px);
-}
-
-/* ===== LOADING SPINNER ===== */
-.loading-spinner {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    border: 6px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 1000;
-}
-
-@keyframes spin {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-.loading-spinner.active {
-    display: block;
-}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 </head>
 
 <body>
@@ -293,173 +157,174 @@ p {
 
 <div class="loading-spinner" id="loadingSpinner"></div>
 
-<div class="letter">
-  <div class="inner-border"></div>
-  <div class="watermark"></div>
+<div class="letter" id="letter">
 
-  <div class="content">
-    <h1>SELECTION LETTER</h1>
+<div class="inner-border"></div>
+<div class="watermark"></div>
 
-    <div class="heading">TO:</div>
-    <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><span id="name"></span></b><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="district"></span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ph No: <span id="phone"></span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register No: <span id="regNo"></span>
-    </p>
+<div class="content">
 
-    <div class="heading">RESPECTED SIR / MADAM,</div>
-    <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to inform you that the documents submitted by you for work purposes
-      have been successfully verified. Based on the verification, you have been
-      selected for <strong>Training and Interview</strong> at
-      <strong>V Believers Marketing Pvt Ltd</strong>.
-    </p>
+<h1>SELECTION LETTER</h1>
 
-    <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Your dedication and commitment are highly appreciated. We believe your
-      professional skills will add strategic value to our organization.
-    </p>
+<div class="heading">TO:</div>
 
-    <div class="heading">Training Details</div>
-    <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training Start Date: <span id="circleDate"></span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reporting Time: 9:30 AM onwards<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<b><u>Note:</u> Please verify your documents before the training day and if you want food & accommodation you need to take membership.</b>
-    </p>
+<p>
+<b><span id="name"></span></b><br>
+<span id="district"></span><br>
+Ph No: <span id="phone"></span><br>
+Register No: <span id="regNo"></span>
+</p>
 
-    <div class="heading">Documents to be Submitted (Xerox copies only)</div>
-    <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• Aadhar Card<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• PAN Card<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• Education Certificates<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• Bank Passbook<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• Two Passport Size Photos
-    </p>
+<div class="heading">RESPECTED SIR / MADAM,</div>
 
-    <div class="heading">Training Location</div>
-    <p>
-      <a id="mapLink" class="map-link" target="_blank">View on Google Maps</a>
-    </p>
+<p>
+This is to inform you that the documents submitted by you for work purposes
+have been successfully verified. Based on the verification, you have been
+selected for <strong>Training and Interview</strong> at
+<strong>V Believers Marketing Pvt Ltd</strong>.
+</p>
 
-    <div class="footer">
-      Kindly ensure timely reporting with all required documents.<br><br>
-      Warm Regards,<br>
-      <strong>HR Department</strong><br>
-      V Believers Marketing Pvt Ltd<br>
-      7075110436
-    </div>
-  </div>
+<p>
+Your dedication and commitment are highly appreciated. We believe your
+professional skills will add strategic value to our organization.
+</p>
+
+<div class="heading">Training Details</div>
+
+<p>
+Training Start Date: <span id="circleDate"></span><br>
+Reporting Time: 9:30 AM onwards<br>
+<b><u>Note:</u> Please verify your documents before the training day and if you want food & accommodation you need to take membership.</b>
+</p>
+
+<div class="heading">Documents to be Submitted (Xerox copies only)</div>
+
+<p>
+• Aadhar Card<br>
+• PAN Card<br>
+• Education Certificates<br>
+• Bank Passbook<br>
+• Two Passport Size Photos
+</p>
+
+<div class="heading">Training Location</div>
+
+<p>
+<a id="mapLink" class="map-link" target="_blank">View on Google Maps</a>
+</p>
+
+<div class="footer">
+Kindly ensure timely reporting with all required documents.<br><br>
+Warm Regards,<br>
+<strong>HR Department</strong><br>
+V Believers Marketing Pvt Ltd<br>
+7075110436
+</div>
+
+</div>
 </div>
 
 <script>
-window.onload = function() {
-    let data = {};
-    try {
-        const dataStr = localStorage.getItem("letterData");
-        if (dataStr) {
-            data = JSON.parse(dataStr);
-            console.log("Retrieved Data:", data);
-        }
-    } catch (e) {
-        console.error("Invalid letterData in localStorage", e);
-    }
 
-    function formatDate(dateStr) {
-        if (!dateStr || !dateStr.includes("-")) return dateStr || "DD-MM-YYYY";
-        const [year, month, day] = dateStr.split("-");
-        return `${day}-${month}-${year}`;
-    }
+window.onload=function(){
 
-    document.getElementById("regNo").textContent = data.regNo || "N/A";
-    document.getElementById("name").textContent = data.name || "N/A";
-    document.getElementById("district").textContent = data.district || "N/A";
-    document.getElementById("phone").textContent = data.phone || "N/A";
-    document.getElementById("circleDate").textContent = formatDate(data.circleDate) || "DD-MM-YYYY";
+let data={}
 
-    document.getElementById("docTitle").textContent = (data.name || "Applicant") + " - Selection Letter";
+try{
+data=JSON.parse(localStorage.getItem("letterData"))||{}
+}catch(e){}
 
-    window.currentEmail = data.email || null;
-
-    const mapLinks = {
-        "Kurnool": "https://maps.app.goo.gl/TVFiSap2dGzCM9Lj7",
-        "Hyderabad1": "https://maps.app.goo.gl/rpUcuiWzekY2xMf27",
-        "Hyderabad2": "https://maps.app.goo.gl/B5taGhyEiw2aBg66A",
-        "Kalahasthi": "https://maps.app.goo.gl/UowCoAtHoXbLeKDf6"
-    };
-    
-    const mapLinkEl = document.getElementById("mapLink");
-    mapLinkEl.href = mapLinks[data.branch] || "https://www.google.com/maps";
-    mapLinkEl.innerText = "📍 View Training Location on Google Maps";
-};
-
-// 📧 SEND EMAIL FUNCTION WITH LOADING ANIMATION
-async function sendEmail() {
-    const btn = document.querySelector(".email-btn");
-    const spinner = document.getElementById("loadingSpinner");
-
-    if (!window.currentEmail) {
-        alert("❌ Error: No email found for this applicant.");
-        return;
-    }
-
-    btn.innerText = "⏳ Generating PDF...";
-    btn.disabled = true;
-    spinner.classList.add('active');
-
-    try {
-        const { jsPDF } = window.jspdf;
-        const element = document.querySelector(".letter");
-
-        const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    scrollY: -window.scrollY,
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight
-});
-        const imgData = canvas.toDataURL('image/jpeg', 0.7);
-
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 210;
-const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-        
-        const mapUrl = document.getElementById("mapLink").href;
-        pdf.link(70, 210, 70, 8, { url: mapUrl });
-
-        const pdfBase64 = pdf.output('datauristring');
-        const name = document.getElementById("name").innerText;
-
-        const response = await fetch('/api/send-mail', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: window.currentEmail,
-                name: name,
-                pdfData: pdfBase64
-            })
-        });
-
-        if (response.ok) {
-            alert("✅ Success! Letter sent to " + window.currentEmail);
-        } else {
-            const errorData = await response.json().catch(() => ({}));
-            alert("❌ Failed: " + (errorData.error || "Server error"));
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Error: Could not connect to the server.");
-    } finally {
-        btn.innerText = "✉ Send PDF via Email";
-        btn.disabled = false;
-        spinner.classList.remove('active');
-    }
+function formatDate(dateStr){
+if(!dateStr)return"DD-MM-YYYY"
+const[year,month,day]=dateStr.split("-")
+return `${day}-${month}-${year}`
 }
+
+document.getElementById("regNo").textContent=data.regNo||"N/A"
+document.getElementById("name").textContent=data.name||"N/A"
+document.getElementById("district").textContent=data.district||"N/A"
+document.getElementById("phone").textContent=data.phone||"N/A"
+document.getElementById("circleDate").textContent=formatDate(data.circleDate)
+
+window.currentEmail=data.email||null
+
+const mapLinks={
+"Kurnool":"https://maps.app.goo.gl/TVFiSap2dGzCM9Lj7",
+"Hyderabad1":"https://maps.app.goo.gl/rpUcuiWzekY2xMf27",
+"Hyderabad2":"https://maps.app.goo.gl/B5taGhyEiw2aBg66A",
+"Kalahasthi":"https://maps.app.goo.gl/UowCoAtHoXbLeKDf6"
+}
+
+document.getElementById("mapLink").href=mapLinks[data.branch]||"https://google.com/maps"
+
+}
+
+async function sendEmail(){
+
+const btn=document.querySelector(".email-btn")
+const spinner=document.getElementById("loadingSpinner")
+
+if(!window.currentEmail){
+alert("No email found")
+return
+}
+
+btn.innerText="Generating PDF..."
+btn.disabled=true
+spinner.classList.add("active")
+
+try{
+
+const {jsPDF}=window.jspdf
+const element=document.getElementById("letter")
+
+const canvas=await html2canvas(element,{
+scale:2,
+useCORS:true,
+scrollY:-window.scrollY,
+windowWidth:element.scrollWidth,
+windowHeight:element.scrollHeight
+})
+
+const imgData=canvas.toDataURL("image/jpeg",0.9)
+
+const pdf=new jsPDF("p","mm","a4")
+
+const imgWidth=210
+const imgHeight=(canvas.height*imgWidth)/canvas.width
+
+pdf.addImage(imgData,"JPEG",0,0,imgWidth,imgHeight)
+
+const pdfBase64=pdf.output("datauristring")
+
+const response=await fetch("/api/send-mail",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+email:window.currentEmail,
+name:document.getElementById("name").innerText,
+pdfData:pdfBase64
+})
+})
+
+if(response.ok){
+alert("Email sent successfully")
+}else{
+alert("Failed to send email")
+}
+
+}catch(e){
+console.error(e)
+alert("Server error")
+}
+
+btn.innerText="✉ Send PDF via Email"
+btn.disabled=false
+spinner.classList.remove("active")
+
+}
+
 </script>
 
 </body>
 </html>
-
