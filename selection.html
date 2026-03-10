@@ -7,7 +7,100 @@
 
 <style>
 /* ===== ANIMATED BACKGROUND ===== */
-body {
+body {<!-- Add this updated sendEmail function to replace the old one -->
+
+<script>
+// ... existing code ...
+
+// 📧 IMPROVED SEND EMAIL FUNCTION - Handles Large PDFs
+async function sendEmail() {
+    const btn = document.getElementById("sendBtn");
+    const spinner = document.getElementById("loadingSpinner");
+    const letterEl = document.getElementById("letterElement");
+
+    if (!window.currentEmail) {
+        alert("❌ Error: No email found for this applicant.");
+        return;
+    }
+
+    btn.innerText = "⏳ Generating PDF...";
+    btn.disabled = true;
+    spinner.classList.add('active');
+
+    try {
+        // Step 1: Disable animations for PDF capture
+        letterEl.classList.add('pdf-mode');
+        
+        // Step 2: Wait for DOM to be ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const { jsPDF } = window.jspdf;
+        const element = document.querySelector(".letter");
+
+        // Step 3: Capture with proper settings
+        const canvas = await html2canvas(element, { 
+            scale: 1.5,  // Reduced from 2 for smaller file size
+            useCORS: true,
+            logging: false,
+            allowTaint: true,
+            backgroundColor: '#ffffff'
+        });
+
+        // Step 4: Compress image and convert to base64
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);  // Use JPEG with 80% quality for smaller size
+        console.log("Image data size:", (imgData.length / 1024 / 1024).toFixed(2), "MB");
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+        
+        // Add clickable link for map
+        const mapUrl = document.getElementById("mapLink").href;
+        if (mapUrl && mapUrl !== "https://www.google.com/maps") {
+            pdf.link(70, 210, 70, 8, { url: mapUrl });
+        }
+
+        // Step 5: Get PDF as base64 (not data URI)
+        const pdfBase64 = pdf.output('datauristring');
+        console.log("PDF data URI size:", (pdfBase64.length / 1024 / 1024).toFixed(2), "MB");
+
+        const name = document.getElementById("name").textContent;
+
+        // Step 6: Send via API with proper headers
+        btn.innerText = "📧 Sending email...";
+
+        const response = await fetch('/api/send-mail', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: window.currentEmail,
+                name: name,
+                pdfData: pdfBase64
+            })
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) {
+            alert("✅ Success! Letter sent to " + window.currentEmail);
+        } else {
+            console.error("Server error:", responseData);
+            alert("❌ Failed: " + (responseData.error || "Server error"));
+        }
+
+    } catch (err) {
+        console.error("PDF Generation Error:", err);
+        alert("❌ Error: Could not generate PDF.\n\nDetails: " + err.message);
+    } finally {
+        // Re-enable animations
+        letterEl.classList.remove('pdf-mode');
+        btn.innerText = "✉ Send PDF via Email";
+        btn.disabled = false;
+        spinner.classList.remove('active');
+    }
+}
+</script>
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
@@ -494,3 +587,4 @@ async function sendEmail() {
 
 </body>
 </html>
+
